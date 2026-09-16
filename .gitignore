@@ -1,0 +1,52 @@
+# Visual Studio / IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.tmp
+
+# Build output
+[Bb]in/
+[Oo]bj/
+artifacts/
+
+# Test results / coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Local databases
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.Local.json
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Rider / ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
