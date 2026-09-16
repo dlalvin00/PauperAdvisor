@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using PauperAdvisor.Data;
+using PauperAdvisor.RAG.Configuration;
+using PauperAdvisor.RAG.Services;
+using PauperAdvisor.RAG.Storage;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Adiciona os controladores REST
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -12,20 +14,30 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<PauperAdvisor.RAG.Services.IEmbeddingService, PauperAdvisor.RAG.Services.OllamaEmbeddingService>();
-builder.Services.AddSingleton<PauperAdvisor.RAG.Storage.QdrantStorageService>();
-builder.Services.AddSingleton<PauperAdvisor.RAG.Services.IngestionStatusService>();
+var ollamaOptions = builder.Configuration
+    .GetSection(OllamaOptions.SectionName)
+    .Get<OllamaOptions>() ?? new OllamaOptions();
 
-builder.Services.AddScoped<PauperAdvisor.RAG.Services.RetrievalService>();
-builder.Services.AddScoped<PauperAdvisor.RAG.Services.ChatService>();
+var qdrantOptions = builder.Configuration
+    .GetSection(QdrantOptions.SectionName)
+    .Get<QdrantOptions>() ?? new QdrantOptions();
 
-// Configura o SQLite com um banco local ao projeto
+builder.Services.AddSingleton(ollamaOptions);
+builder.Services.AddSingleton(qdrantOptions);
+builder.Services.AddSingleton<IEmbeddingService, OllamaEmbeddingService>();
+builder.Services.AddSingleton<QdrantStorageService>();
+builder.Services.AddSingleton<IngestionStatusService>();
+builder.Services.AddScoped<RetrievalService>();
+builder.Services.AddScoped<ChatService>();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Data Source=pauper_advisor.db";
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=pauper_advisor.db"));
+    options.UseSqlite(connectionString));
 
 var app = builder.Build();
 
-// Habilita a interface do Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

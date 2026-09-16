@@ -1,5 +1,6 @@
-﻿using OllamaSharp;
+using OllamaSharp;
 using OllamaSharp.Models;
+using PauperAdvisor.RAG.Configuration;
 using System.Text;
 
 namespace PauperAdvisor.RAG.Services;
@@ -8,14 +9,12 @@ public class ChatService
 {
     private readonly OllamaApiClient _ollamaClient;
     private readonly RetrievalService _retrievalService;
-    private const string ModelName = "qwen2.5vl:7b";
-
-    public ChatService(RetrievalService retrievalService)
+    public ChatService(RetrievalService retrievalService, OllamaOptions options)
     {
         _retrievalService = retrievalService;
-        _ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"))
+        _ollamaClient = new OllamaApiClient(new Uri(options.BaseUrl))
         {
-            SelectedModel = ModelName
+            SelectedModel = options.ChatModel
         };
     }
 

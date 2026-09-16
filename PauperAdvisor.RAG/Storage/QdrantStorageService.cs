@@ -1,4 +1,5 @@
-﻿using Qdrant.Client;
+using PauperAdvisor.RAG.Configuration;
+using Qdrant.Client;
 using Qdrant.Client.Grpc;
 
 namespace PauperAdvisor.RAG.Storage;
@@ -6,25 +7,27 @@ namespace PauperAdvisor.RAG.Storage;
 public class QdrantStorageService
 {
     private readonly QdrantClient _client;
-    public const string CollectionName = "pauper_knowledge";
+    private readonly QdrantOptions _options;
 
-    public QdrantStorageService()
+    public QdrantStorageService(QdrantOptions options)
     {
-        // Conecta ao container local do Qdrant configurado anteriormente
-        _client = new QdrantClient("localhost", 6334);
+        _options = options;
+        _client = new QdrantClient(options.Host, options.GrpcPort);
     }
 
     public async Task InitializeCollectionAsync()
     {
         var collections = await _client.ListCollectionsAsync();
 
-        if (!collections.Contains(CollectionName))
+        if (!collections.Contains(_options.CollectionName))
         {
-            // Cria a coleção para o modelo nomic-embed-text (768 dimensões)
-            // Utiliza a métrica de Cosseno, ideal para similaridade semântica de textos
             await _client.CreateCollectionAsync(
-                collectionName: CollectionName,
-                vectorsConfig: new VectorParams { Size = 768, Distance = Distance.Cosine }
+                collectionName: _options.CollectionName,
+                vectorsConfig: new VectorParams
+                {
+                    Size = _options.VectorSize,
+                    Distance = Distance.Cosine
+                }
             );
         }
     }
@@ -37,20 +40,18 @@ public class QdrantStorageService
             Vectors = vector,
         };
 
-        // Adiciona a metadata (ex: OracleId, Tipo, Texto original)
         foreach (var item in payload)
         {
             pointStruct.Payload.Add(item.Key, item.Value);
         }
 
-        await _client.UpsertAsync(CollectionName, new[] { pointStruct });
+        await _client.UpsertAsync(_options.CollectionName, new[] { pointStruct });
     }
 
-    public async Task<IReadOnlyList<Qdrant.Client.Grpc.ScoredPoint>> SearchAsync(float[] vector, int limit = 20)
+    public async Task<IReadOnlyList<ScoredPoint>> SearchAsync(float[] vector, int limit = 20)
     {
-        // Realiza a busca por similaridade de cosseno usando o vetor da pergunta
         return await _client.QueryAsync(
-            collectionName: CollectionName,
+            collectionName: _options.CollectionName,
             query: vector,
             limit: (ulong)limit
         );

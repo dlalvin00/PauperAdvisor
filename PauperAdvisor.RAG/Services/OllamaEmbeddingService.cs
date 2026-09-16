@@ -1,31 +1,32 @@
-﻿using OllamaSharp;
+using OllamaSharp;
 using OllamaSharp.Models;
+using PauperAdvisor.RAG.Configuration;
 
 namespace PauperAdvisor.RAG.Services;
 
 public class OllamaEmbeddingService : IEmbeddingService
 {
     private readonly OllamaApiClient _ollamaClient;
-    private const string ModelName = "nomic-embed-text";
+    private readonly string _modelName;
 
-    public OllamaEmbeddingService()
+    public OllamaEmbeddingService(OllamaOptions options)
     {
-        _ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"));
-        _ollamaClient.SelectedModel = ModelName;
+        _modelName = options.EmbeddingModel;
+        _ollamaClient = new OllamaApiClient(new Uri(options.BaseUrl))
+        {
+            SelectedModel = _modelName
+        };
     }
 
     public async Task<float[]> GenerateEmbeddingAsync(string text)
     {
         var request = new EmbedRequest
         {
-            Model = ModelName,
-            // Colocamos a string dentro de uma lista para satisfazer a tipagem
+            Model = _modelName,
             Input = new List<string> { text }
         };
 
         var response = await _ollamaClient.EmbedAsync(request);
-
-        // Retorna o primeiro vetor gerado (já que enviamos apenas 1 string na lista)
         return response.Embeddings.First();
     }
 }
