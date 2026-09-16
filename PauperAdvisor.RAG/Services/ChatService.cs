@@ -1,5 +1,4 @@
 using OllamaSharp;
-using OllamaSharp.Models;
 using PauperAdvisor.RAG.Configuration;
 using System.Text;
 
