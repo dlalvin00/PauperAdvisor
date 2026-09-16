@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using PauperAdvisor.Domain.Entities;
 
 namespace PauperAdvisor.Data.Seeding;
@@ -7,9 +8,9 @@ public class DatabaseSeeder(ApplicationDbContext dbContext)
 {
     public async Task SeedAsync(string cardsFilePath, string rulingsFilePath)
     {
-        await dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.MigrateAsync();
 
-        if (dbContext.Cards.Any())
+        if (await dbContext.Cards.AnyAsync())
         {
             Console.WriteLine("Banco já populado. Ignorando importação.");
             return;
