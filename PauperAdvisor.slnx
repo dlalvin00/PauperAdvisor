@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="PauperAdvisor.Api/PauperAdvisor.Api.csproj" />
+  <Project Path="PauperAdvisor.Data/PauperAdvisor.Data.csproj" />
+  <Project Path="PauperAdvisor.Domain/PauperAdvisor.Domain.csproj" />
+  <Project Path="PauperAdvisor.Importer/PauperAdvisor.Importer.csproj" />
+  <Project Path="PauperAdvisor.RAG/PauperAdvisor.RAG.csproj" />
+</Solution>
