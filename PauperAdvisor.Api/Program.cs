@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PauperAdvisor.Data;
+using PauperAdvisor.Data.DeckLists;
 using PauperAdvisor.RAG.Configuration;
 using PauperAdvisor.RAG.Services;
 using PauperAdvisor.RAG.Storage;
@@ -11,6 +12,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -24,11 +26,14 @@ var qdrantOptions = builder.Configuration
 
 builder.Services.AddSingleton(ollamaOptions);
 builder.Services.AddSingleton(qdrantOptions);
+
 builder.Services.AddSingleton<IEmbeddingService, OllamaEmbeddingService>();
 builder.Services.AddSingleton<QdrantStorageService>();
 builder.Services.AddSingleton<IngestionStatusService>();
+
 builder.Services.AddScoped<RetrievalService>();
 builder.Services.AddScoped<ChatService>();
+builder.Services.AddScoped<DeckListParser>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Data Source=pauper_advisor.db";
