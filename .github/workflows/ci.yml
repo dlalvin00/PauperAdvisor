@@ -27,3 +27,6 @@ jobs:
 
       - name: Build
         run: dotnet build PauperAdvisor.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test PauperAdvisor.slnx --configuration Release --no-build

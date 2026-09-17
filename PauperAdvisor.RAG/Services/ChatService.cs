@@ -1,4 +1,5 @@
 using OllamaSharp;
+using PauperAdvisor.Domain.Decks;
 using PauperAdvisor.RAG.Configuration;
 using System.Text;
 
@@ -45,7 +46,7 @@ public class ChatService
         return responseBuilder.ToString();
     }
 
-    public async Task<string> AnalyzeMatchupAsync(Stream imageStream, string mainDeck, string sideboard, string question)
+    public async Task<string> AnalyzeMatchupAsync(Stream imageStream, DeckList mainDeck, DeckList sideboard, string question)
     {
         using var memoryStream = new MemoryStream();
         await imageStream.CopyToAsync(memoryStream);
@@ -74,8 +75,8 @@ public class ChatService
             Based on the opponent's confirmed cards, identify their archetype and calculate the optimal sideboard swap.
             
             OPPONENT'S CONFIRMED CARDS: {verifiedOpponentBoard}
-            MY MAIN DECK: {mainDeck}
-            MY SIDEBOARD: {sideboard}
+            MY MAIN DECK: {FormatDeckList(mainDeck)}
+            MY SIDEBOARD: {FormatDeckList(sideboard)}
             
             CRITICAL SYSTEM RULES:
             1. NEVER suggest removing Lands (e.g., Mountains, Swamps, Bridges, Gorges).
@@ -103,5 +104,15 @@ public class ChatService
         }
 
         return strategyBuilder.ToString();
+    }
+
+    private static string FormatDeckList(
+    DeckList deckList)
+    {
+        return string.Join(
+            Environment.NewLine,
+            deckList.Cards.Select(
+                card =>
+                    $"{card.Quantity} {card.Name}"));
     }
 }

@@ -4,4 +4,5 @@
   <Project Path="PauperAdvisor.Domain/PauperAdvisor.Domain.csproj" />
   <Project Path="PauperAdvisor.Importer/PauperAdvisor.Importer.csproj" />
   <Project Path="PauperAdvisor.RAG/PauperAdvisor.RAG.csproj" />
+  <Project Path="PauperAdvisor.Tests/PauperAdvisor.Tests.csproj" />
 </Solution>
